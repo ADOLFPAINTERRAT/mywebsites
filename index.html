@@ -292,10 +292,16 @@
     var seeking = false;
     var SENSITIVITY = 0.8;
 
-    /* Queue next seek only after the current one finishes — no seek-flooding */
+    // Wait for metadata so duration is available
+    video.addEventListener('loadedmetadata', function () {
+      targetTime = 0;
+      video.currentTime = 0;
+    });
+
+    // onseeked: flush any pending targetTime
     video.addEventListener('seeked', function () {
       seeking = false;
-      if (Math.abs(video.currentTime - targetTime) > 0.01) {
+      if (Math.abs(video.currentTime - targetTime) > 0.001) {
         seeking = true;
         video.currentTime = targetTime;
       }
@@ -318,7 +324,6 @@
       }
     });
 
-    /* Reset prevX when mouse leaves so no jump on re-entry */
     window.addEventListener('mouseleave', function () { prevX = null; });
   })();
 </script>
